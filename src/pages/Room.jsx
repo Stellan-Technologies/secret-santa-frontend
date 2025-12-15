@@ -10,6 +10,7 @@ export default function Room() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
 
+  const [showResend, setShowResend] = useState(false);
   const [resending, setResending] = useState(false);
 
   const [participants, setParticipants] = useState([]);
@@ -17,27 +18,6 @@ export default function Room() {
   const [loading, setLoading] = useState(true);
 
   const [resendingDraw, setResendingDraw] = useState(false);
-
-  const handleResend = async () => {
-  if (!email) return toast.error("Enter your email first");
-
-  try {
-    setResending(true);
-
-    await api.post("/participants/resend", {
-      email,
-      roomCode
-    });
-
-    toast.success("Verification email resent!");
-
-  } catch (err) {
-    toast.error(err?.response?.data?.message || "Failed to resend email");
-  } finally {
-    setResending(false);
-  }
-};
-
 
   // Load participants for this room
   const loadParticipants = async () => {
@@ -102,15 +82,29 @@ export default function Room() {
       });
 
       toast.success("Verification email sent!");
-      setName("");
-      setEmail("");
-      // refresh
-      await loadParticipants();
-      await loadDrawState();
+      setShowResend(true); // 👈 SHOW resend button
     } catch (err) {
       toast.error(err?.response?.data?.message || "Registration failed");
     }
   };
+
+  const handleResend = async () => {
+  try {
+    setResending(true);
+
+    await api.post("/participants/resend-verification", {
+      name,
+      email,
+      roomCode
+    });
+
+    toast.success("Verification email resent!");
+  } catch (err) {
+    toast.error(err?.response?.data?.message || "Resend failed");
+  } finally {
+    setResending(false);
+  }
+};
 
   // Run draw for this room
   const handleDraw = async () => {
@@ -191,15 +185,17 @@ return (
         Register & Get Verification Email
       </button>
 
-      {/* RESEND VERIFICATION */}
-      <button
-        onClick={handleResend}
-        disabled={resending}
-        className="mt-2 w-full bg-blue-500 hover:bg-blue-400 py-2 rounded-lg font-bold transition"
-      >
-        {resending ? "Resending..." : "Resend Verification Email"}
-      </button>
+      {showResend && (
+        <button
+          onClick={handleResend}
+          disabled={resending}
+          className="mt-2 w-full bg-blue-500 hover:bg-blue-400 py-2 rounded-lg font-bold transition"
+        >
+          {resending ? "Resending..." : "Resend Verification Email"}
+        </button>
+      )}
     </div>
+
 
     {/* PARTICIPANTS LIST */}
     <h2 className="text-2xl font-bold mb-3 text-center">
