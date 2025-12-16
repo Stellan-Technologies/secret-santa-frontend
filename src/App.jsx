@@ -4,6 +4,8 @@ import Room from "./pages/Room";
 import Verify from "./pages/Verify";
 import { Toaster } from "react-hot-toast";
 import SnowParticles from "./components/SnowParticles";
+import Delete from "./pages/Delete";
+
 
 export default function App() {
   return (
@@ -19,6 +21,7 @@ export default function App() {
             <Route path="/" element={<Home />} />               {/* CREATE / JOIN ROOM */}
             <Route path="/room/:roomCode" element={<Room />} /> {/* ROOM PAGE */}
             <Route path="/verify" element={<Verify />} />        {/* EMAIL VERIFY */}
+            <Route path="/delete" element={<Delete />} />
           </Routes>
         </div>
       </BrowserRouter>

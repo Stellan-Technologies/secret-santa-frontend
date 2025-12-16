@@ -131,7 +131,17 @@ const handleResendDrawEmail = async () => {
   }
 };
 
+const handleDeleteRequest = async (participantId) => {
+  try {
+    await api.post("/participants/resend-delete", {
+      participantId
+    });
 
+    toast.success("Delete confirmation email sent");
+  } catch (err) {
+    toast.error(err?.response?.data?.message || "Delete failed");
+  }
+};
 
   // Copy invite link
   const copyLink = () => {
@@ -155,7 +165,13 @@ return (
     {/* COPY LINK */}
     <button
       onClick={copyLink}
-      className="w-full mb-6 bg-yellow-400 text-red-900 py-2 rounded-lg font-bold hover:bg-yellow-300"
+      className="
+        w-full mb-6 py-2 rounded-lg font-bold
+        bg-yellow-400 text-red-900
+        transition-all duration-200
+        hover:bg-yellow-300 hover:shadow-lg hover:scale-[1.02]
+        active:scale-[0.98]
+      "
     >
       Copy Invite Link
     </button>
@@ -189,7 +205,14 @@ return (
         <button
           onClick={handleResend}
           disabled={resending}
-          className="mt-2 w-full bg-blue-500 hover:bg-blue-400 py-2 rounded-lg font-bold transition"
+          className="
+            mt-2 w-full py-2 rounded-lg font-bold
+            bg-red-500 text-white
+            transition-all duration-200
+            hover:bg-red-400 hover:shadow-lg hover:scale-[1.02]
+            active:scale-[0.98]
+            disabled:opacity-60 disabled:cursor-not-allowed
+          "
         >
           {resending ? "Resending..." : "Resend Verification Email"}
         </button>
@@ -209,12 +232,21 @@ return (
         {participants.map((p) => (
           <motion.li
             key={p._id}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="p-3 bg-red-900/50 rounded-lg shadow flex items-center justify-center space-x-3"
+            className="p-3 bg-red-900/50 rounded-lg shadow flex justify-between items-center"
           >
-            <span className="text-2xl animate-pulse">🎁</span>
-            <strong className="text-lg">{p.name}</strong>
+            <div className="flex items-center space-x-3">
+              <span className="text-2xl">🎁</span>
+              <strong>{p.name}</strong>
+            </div>
+
+            {!drawDisabled && (
+            <button
+              onClick={() => handleDeleteRequest(p._id)}
+              className="ml-auto text-red-400 hover:text-red-600 transition"
+            >
+              ❌
+            </button>
+            )}
           </motion.li>
         ))}
       </ul>
@@ -226,11 +258,13 @@ return (
         <button
           onClick={handleDraw}
           disabled={drawDisabled}
-          className={`mt-6 w-full py-2 rounded-lg font-bold transition ${
-            drawDisabled
-              ? "bg-gray-500 cursor-not-allowed"
-              : "bg-blue-500 hover:bg-blue-400"
-          }`}
+          className={`
+            mt-6 w-full py-2 rounded-lg font-bold transition-all duration-200
+            ${drawDisabled
+              ? "bg-gray-500 cursor-not-allowed opacity-70"
+              : "bg-blue-500 hover:bg-blue-400 hover:scale-[1.02] active:scale-[0.98]"
+            }
+          `}
         >
           {drawDisabled ? "Draw Already Completed" : "Run Secret Santa Draw"}
         </button>

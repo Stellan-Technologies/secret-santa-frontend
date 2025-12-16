@@ -54,21 +54,33 @@ export default function Home() {
         />
         <button
           onClick={handleJoinRoom}
-          className="mt-4 w-full bg-green-500 hover:bg-green-400 py-2 rounded-lg font-bold"
+          className="
+            mt-4 w-full py-2 rounded-lg font-bold
+            bg-green-500 text-white
+            transition-all duration-200
+            hover:bg-green-400 hover:scale-[1.02]
+            active:scale-[0.98]
+          "
         >
           Join Room
         </button>
       </div>
 
       <hr className="border-red-300/50 my-6" />
-
-      <button
-        onClick={handleCreateRoom}
-        disabled={creating}
-        className="w-full bg-yellow-400 text-red-900 py-2 rounded-lg font-bold hover:bg-yellow-300"
-      >
-        {creating ? "Creating..." : "Create New Room 🎁"}
-      </button>
+        <button
+          onClick={handleCreateRoom}
+          disabled={creating}
+          className="
+            w-full py-3 rounded-lg font-bold
+            bg-green-500 text-white
+            transition-all duration-200
+            hover:bg-green-400 hover:scale-[1.02]
+            active:scale-[0.98]
+            disabled:opacity-60 disabled:cursor-not-allowed
+          "
+        >
+          {creating ? "Creating..." : "Create New Room"}
+        </button>
     </div>
   );
 }
