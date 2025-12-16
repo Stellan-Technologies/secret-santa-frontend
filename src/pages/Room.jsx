@@ -17,6 +17,8 @@ export default function Room() {
   const [drawState, setDrawState] = useState({ hasDrawRun: false, lastCount: 0 });
   const [loading, setLoading] = useState(true);
 
+  const [deleteInProgressId, setDeleteInProgressId] = useState(null);
+
   const [resendingDraw, setResendingDraw] = useState(false);
 
   // Load participants for this room
@@ -62,6 +64,10 @@ export default function Room() {
     }, 5000);
     return () => clearInterval(id);
   }, [roomCode]);
+
+  useEffect(() => {
+    setDeleteInProgressId(null);
+  }, [participants.length]);
 
   // Reset draw flag when participant count changes
   useEffect(() => {
@@ -133,6 +139,8 @@ const handleResendDrawEmail = async () => {
 
 const handleDeleteRequest = async (participantId) => {
   try {
+    setDeleteInProgressId(participantId);
+
     await api.post("/participants/resend-delete", {
       participantId
     });
@@ -140,6 +148,7 @@ const handleDeleteRequest = async (participantId) => {
     toast.success("Delete confirmation email sent");
   } catch (err) {
     toast.error(err?.response?.data?.message || "Delete failed");
+    setDeleteInProgressId(null);
   }
 };
 
@@ -242,9 +251,16 @@ return (
             {!drawDisabled && (
             <button
               onClick={() => handleDeleteRequest(p._id)}
-              className="ml-auto text-red-400 hover:text-red-600 transition"
+              disabled={deleteInProgressId === p._id || drawState.hasDrawRun}
+              className={`ml-auto transition ${
+                drawState.hasDrawRun
+                  ? "text-gray-400 cursor-not-allowed"
+                  : deleteInProgressId === p._id
+                    ? "text-yellow-400 cursor-wait"
+                    : "text-red-400 hover:text-red-600"
+              }`}
             >
-              ❌
+              {deleteInProgressId === p._id ? "⏳" : "❌"}
             </button>
             )}
           </motion.li>
